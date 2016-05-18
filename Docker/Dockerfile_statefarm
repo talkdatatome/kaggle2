@@ -1,0 +1,32 @@
+FROM python:3.5
+
+RUN apt-get update && apt-get install -y less lynx vim
+
+RUN pip3.5 install jupyter numpy scipy scikit-learn scikit-image pandas
+
+EXPOSE 8888
+
+RUN mkdir notebooks
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y build-essential cmake git pkg-config 
+
+RUN apt-get install -y libjpeg-dev libtiff-dev libjasper-dev libpng-dev zlib1g-dev libopenexr-dev libxine2-dev libeigen3-dev libtbb-dev
+
+RUN apt-get install -y libgtk2.0-dev libatlas-base-dev gfortran
+
+RUN git clone https://github.com/Itseez/opencv.git && cd opencv && git checkout 3.1.0
+
+RUN cd ~ && git clone https://github.com/Itseez/opencv_contrib.git && cd opencv_contrib && git checkout 3.1.0
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libavfilter-dev libswscale-dev
+
+RUN cd /opencv && mkdir build && cd build && cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D BUILD_PYTHON_SUPPORT=ON \
+    -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
+    -D WITH_XINE=ON \
+    -D WITH_TBB=ON \
+    -D BUILD_EXAMPLES=ON .. && make && make install 
+
+CMD jupyter notebook --no-browser --ip=0.0.0.0 --port=8888 --notebook-dir=/notebooks
+
