@@ -1,0 +1,12 @@
+FROM debian:jessie
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y cmake libopencv-dev libboost-all-dev git
+
+RUN git clone https://github.com/JoakimSoderberg/imageclipper.git && \
+cd imageclipper && mkdir build && cd build && cmake ..
+
+RUN cd imageclipper/build && cmake --build .
+
+# should just be able to run it in /imageclipper/build/bin/imageclipper
+# if not probably due to X11 not being set up properly in docker...
+CMD /imageclipper/build/bin/imageclipper
