@@ -1,0 +1,14 @@
+# creates R with libraries needed to run code with mxnet library
+FROM r-base:3.3.0
+
+# build shared library for mxnet
+RUN apt-get update && apt-get install -y build-essential git libatlas-base-dev libopencv-dev libcurl4-openssl-dev libfftw3-dev 
+
+RUN git clone --recursive https://github.com/dmlc/mxnet && cd mxnet && make -j4
+RUN R -e 'install.packages(c("doParallel", "foreach", "imager", "data.table", "nnet"))'
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y libssl-dev openssl
+# build interface package
+RUN cd mxnet/R-package && R -e "install.packages('devtools')" && R -e "library(devtools); library(methods); options(repos=c(CRAN='https://cran.rstudio.com')); install_deps(dependencies=TRUE)" && cd .. && make rpkg && R CMD INSTALL mxnet_0.5.tar.gz
+
+CMD bash 
