@@ -11,4 +11,6 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y libssl-dev openss
 # build interface package
 RUN cd mxnet/R-package && R -e "install.packages('devtools')" && R -e "library(devtools); library(methods); options(repos=c(CRAN='https://cran.rstudio.com')); install_deps(dependencies=TRUE)" && cd .. && make rpkg && R CMD INSTALL mxnet_0.5.tar.gz
 
-CMD bash 
+COPY fit_model.sh /fit_model.sh
+
+CMD bash /fit_model.sh
